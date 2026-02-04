@@ -25,18 +25,15 @@ jobs:
 
       - name: Build APK
         run: |
-          # Go to the project folder
+          # Go to project folder
           cd extracted_project/*
           
-          # Give permission to the build tool
-          chmod +x gradlew
-          
-          # Build the Debug APK
-          ./gradlew assembleDebug
+          echo "Building with system Gradle..."
+          # Fix: Using 'gradle' instead of './gradlew' to bypass missing wrapper file
+          gradle assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: NimPlus-App
-          # Path to where Gradle saves the APK
           path: extracted_project/**/build/outputs/apk/debug/*.apk
