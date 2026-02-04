@@ -1,0 +1,42 @@
+name: Build Nim-Plus
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout the repository
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # 2. Install Nim compiler
+      - name: Setup Nim
+        uses: jiro4989/setup-nim@v1
+        with:
+          nim-version: 'stable'
+
+      # 3. Unzip the project file
+      - name: Unzip Project
+        run: |
+          unzip nim-plus.zip -d extracted_project
+
+      # 4. Locate files and build
+      - name: Build Project
+        run: |
+          # Enter the extracted folder
+          cd extracted_project/*
+          
+          echo "Files in directory:"
+          ls -la
+          
+          # Check if main.nim exists and build it
+          if [ -f main.nim ]; then
+            nim c -d:release main.nim
+          else
+            echo "main.nim not found. Checking file list..."
+          fi
