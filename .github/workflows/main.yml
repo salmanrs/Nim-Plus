@@ -1,4 +1,4 @@
-name: Build Nim-Plus
+name: Build and Download
 
 on:
   push:
@@ -10,34 +10,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout the repository
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # 2. Install Nim compiler (Fixed action name)
       - name: Setup Nim
         uses: jiro4989/setup-nim-action@v1
         with:
           nim-version: 'stable'
 
-      # 3. Unzip the project file
       - name: Unzip Project
         run: |
           unzip nim-plus.zip -d extracted_project
 
-      # 4. Locate files and build
       - name: Build Project
         run: |
-          # Enter the extracted folder
+          # Go to the extracted folder
           cd extracted_project/*
-          
-          echo "Files in directory:"
           ls -la
           
-          # Check if main.nim exists and build it
-          if [ -f main.nim ]; then
-            echo "Compiling main.nim..."
-            nim c -d:release main.nim
-          else
-            echo "main.nim not found. Please check the file structure."
-          fi
+          # Compile directly. Fails if main.nim is missing.
+          # Output name set to 'nim-plus-app'
+          nim c -d:release -o:nim-plus-app main.nim
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nim-plus-application
+          path: extracted_project/**/nim-plus-app
