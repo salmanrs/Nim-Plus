@@ -1,4 +1,4 @@
-name: Build Android App
+name: Build Android App Fixed
 
 on:
   push:
@@ -19,18 +19,23 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      # Downgrade Gradle to version 7.6 to fix "HasConvention" error
+      - name: Setup Gradle v7.6
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '7.6.3'
+
       - name: Unzip Project
         run: |
           unzip nim-plus.zip -d extracted_project
 
       - name: Build APK
         run: |
-          # Go to project folder
           cd extracted_project/*
           
-          echo "Building with system Gradle..."
-          # Fix: Using 'gradle' instead of './gradlew' to bypass missing wrapper file
-          gradle assembleDebug
+          echo "Building with Gradle 7.6.3..."
+          # Using 'gradle' command which now points to version 7.6.3
+          gradle assembleDebug --warning-mode all
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
