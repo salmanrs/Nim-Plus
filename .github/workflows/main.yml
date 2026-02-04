@@ -1,4 +1,4 @@
-name: Build Android App Final Patch
+name: Build Android App Final Patch 2
 
 on:
   push:
@@ -40,14 +40,22 @@ jobs:
       # --- Fix 2: Patch Broken Colors in XML ---
       - name: Fix Broken XML Attributes
         run: |
-          echo "Patching ic_vpn_key.xml..."
-          # Find the file and replace the broken color attribute with white
           find extracted_project -name "ic_vpn_key.xml" -type f -exec sed -i 's|?attr/colorControlNormal|@android:color/white|g' {} +
-          
-          # Also replace if it is used without 'attr/' prefix
           find extracted_project -name "ic_vpn_key.xml" -type f -exec sed -i 's|?colorControlNormal|@android:color/white|g' {} +
-          
           echo "XML colors fixed."
+
+      # --- Fix 3: Patch Kotlin Imports (NEW) ---
+      - name: Patch Kotlin Code
+        run: |
+          echo "Injecting missing imports..."
+          
+          # Fix 'Color' error in ConfigListScreen
+          find extracted_project -name "ConfigListScreen.kt" -type f -exec sed -i '/package /a import androidx.compose.ui.graphics.Color' {} +
+          
+          # Fix potential Intent/Bundle errors in MainViewModel
+          find extracted_project -name "MainViewModel.kt" -type f -exec sed -i '/package /a import android.content.Intent\nimport android.os.Bundle' {} +
+          
+          echo "Kotlin files patched."
 
       - name: Build APK
         run: |
