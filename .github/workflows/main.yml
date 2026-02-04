@@ -14,9 +14,9 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # 2. Install Nim compiler
+      # 2. Install Nim compiler (Fixed action name)
       - name: Setup Nim
-        uses: jiro4989/setup-nim@v1
+        uses: jiro4989/setup-nim-action@v1
         with:
           nim-version: 'stable'
 
@@ -36,7 +36,8 @@ jobs:
           
           # Check if main.nim exists and build it
           if [ -f main.nim ]; then
+            echo "Compiling main.nim..."
             nim c -d:release main.nim
           else
-            echo "main.nim not found. Checking file list..."
+            echo "main.nim not found. Please check the file structure."
           fi
