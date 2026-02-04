@@ -1,4 +1,4 @@
-name: Build and Download
+name: Auto-Detect and Build
 
 on:
   push:
@@ -22,18 +22,29 @@ jobs:
         run: |
           unzip nim-plus.zip -d extracted_project
 
-      - name: Build Project
+      - name: Find and Build Nim File
         run: |
-          # Go to the extracted folder
+          # Go to extracted folder
           cd extracted_project/*
-          ls -la
           
-          # Compile directly. Fails if main.nim is missing.
-          # Output name set to 'nim-plus-app'
-          nim c -d:release -o:nim-plus-app main.nim
+          echo "Searching for .nim files..."
+          # Find the first .nim file inside any folder (e.g., inside 'app')
+          NIM_FILE=$(find . -name "*.nim" | head -n 1)
 
-      - name: Upload Artifact
+          if [ -n "$NIM_FILE" ]; then
+            echo "Found source file: $NIM_FILE"
+            # Compile it
+            nim c -d:release -o:my-app "$NIM_FILE"
+          else
+            echo "ERROR: No .nim file found in the zip!"
+            # List all files to help debug
+            ls -R
+            exit 1
+          fi
+
+      - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
+        if: success()
         with:
-          name: nim-plus-application
-          path: extracted_project/**/nim-plus-app
+          name: My-Application
+          path: extracted_project/**/my-app
