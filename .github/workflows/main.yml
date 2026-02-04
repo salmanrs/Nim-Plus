@@ -1,4 +1,4 @@
-name: Build Android App Final Patch 4
+name: Build Android App Final Patch 5
 
 on:
   push:
@@ -44,10 +44,10 @@ jobs:
           find extracted_project -name "ic_vpn_key.xml" -type f -exec sed -i 's|?colorControlNormal|@android:color/white|g' {} +
           echo "XML colors fixed."
 
-      # --- Fix 3 & 4: Patch Kotlin Code (All Fixes) ---
+      # --- Fix 3 & 4: Patch Kotlin Code (Refined) ---
       - name: Patch Kotlin Code
         run: |
-          echo "Applying final fixes..."
+          echo "Applying refined fixes..."
           
           # Fix 3.1: Add missing Color import
           find extracted_project -name "ConfigListScreen.kt" -type f -exec sed -i '/package /a import androidx.compose.ui.graphics.Color' {} +
@@ -55,8 +55,11 @@ jobs:
           # Fix 3.2: Disable broken line in MainViewModel
           find extracted_project -name "MainViewModel.kt" -type f -exec sed -i '55s/^/\/\//' {} +
           
-          # Fix 4: Force 'isActive' to true in VpnService (The new fix)
-          # This tricks the compiler to ignore the missing coroutine scope error
+          # Fix 4: Repair VpnService (The Gentle Fix)
+          # Step A: Delete the import line that caused the error (Line 20)
+          find extracted_project -name "VpnService.kt" -type f -exec sed -i '/import .*isActive/d' {} +
+          
+          # Step B: Now safely replace usage in the code body
           find extracted_project -name "VpnService.kt" -type f -exec sed -i 's/isActive/true/g' {} +
           
           echo "All Kotlin files patched."
